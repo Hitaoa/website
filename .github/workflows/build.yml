@@ -9,10 +9,10 @@ on:
 # 任务
 jobs:
     deploy:
-      environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
       runs-on: ubuntu-latest
       steps:
-       - name: Build and Deploy React app to GitHub Pages
-         uses: omkartapale/react-deployment-gh-pages@v1.0.0
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Build and Deploy React app to GitHub Pages
+        uses: omkartapale/react-deployment-gh-pages@v1.0.0
