@@ -8,7 +8,7 @@ on:
 
 # 任务
 jobs:
-  build-and-deploy:
+  build:
     # 服务器环境：最新版 Ubuntu
     runs-on: ubuntu-latest
     steps:
@@ -22,12 +22,34 @@ jobs:
       - name: Build
         run: npm install && npm run build
 
-      # 2、部署到 GitHub Pages
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          REPOSITORY_NAME: hitaoa/hitaoa.github.io
-          BRANCH: master
-          FOLDER: build
-          #注意这里的 public 是仓库根目录下的 public，也就是 npm run build 生成静态资源的路径，比如有的人是 `docs/.vuepress/dist`
+      # # 2、部署到 GitHub Pages
+      # - name: Deploy
+      #   uses: JamesIves/github-pages-deploy-action@releases/v3
+      #   with:
+      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      #     REPOSITORY_NAME: hitaoa/hitaoa.github.io
+      #     BRANCH: master
+      #     FOLDER: build
+      #     #注意这里的 public 是仓库根目录下的 public，也就是 npm run build 生成静态资源的路径，比如有的人是 `docs/.vuepress/dist`
+      # Deploy job
+  deploy:
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2 # or the latest "vX.X.X" version tag for this action
